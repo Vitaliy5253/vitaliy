@@ -7,7 +7,45 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 class BlogCategory extends Model
 {
+    /**
+     * Батьківська категорія
+     *
+     * @return BlogCategory
+     */
+    public function parentCategory()
+    {
+        //належить категорії
+        return $this->belongsTo(BlogCategory::class, 'parent_id', 'id');
+    }
+
+    /**
+     * Приклад аксесуара (Accessor)
+     *
+     * @url https://laravel.com/docs/7.x/eloquent-mutator
+     *
+     * @return string
+     */
+    public function getParentTitleAttribute()
+    {
+        $title = $this->parentCategory->title
+            ?? ($this->isRoot()
+                ? 'Корінь'
+                : '???');
+
+        return $title;
+    }
+
+    /**
+     * Перевірка чи об'єкт є кореневим
+     *
+     * @return bool
+     */
+    public function isRoot()
+    {
+        return $this->id === BlogCategory::ROOT;
+    }
     use SoftDeletes;
+    const ROOT = 1;
     use HasFactory;
     protected $fillable
         = [
